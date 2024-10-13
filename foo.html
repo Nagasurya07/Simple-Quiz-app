@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ultimate Quiz Challenge</title>
+  <style>
+    .container {
+      text-align: center;
+      padding: 50px;
+      background: url('src/backgroungd.png');
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .quiz-box {
+      position: relative;
+      border-radius: 15px;
+      width: 600px;
+      padding: 50px;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.2em;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 15px 30px;
+      margin: 15px;
+      font-size: 1.5em;
+      color: rgb(249, 247, 247);
+      border: 3px solid black;
+      background: linear-gradient(45deg, rgb(214, 187, 64), rgb(255, 223, 90));
+      cursor: pointer;
+      border-radius: 10px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background: linear-gradient(45deg, orange, rgb(255, 140, 0));
+      box-shadow: 0 15px 20px rgba(0, 0, 0, 0.2);
+      transform: translateY(-3px) scale(1.05);
+    }
+
+    .view-score-btn {
+      background: linear-gradient(45deg, #1e90ff, #87cefa);
+      transition: all 0.3s ease;
+    }
+
+    .view-score-btn:hover {
+      background: linear-gradient(45deg, #00bfff, #1e90ff);
+      box-shadow: 0 15px 20px rgba(0, 0, 0, 0.2);
+      transform: translateY(-3px) scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="quiz-box">
+      <h1>WELCOME TO THE ULTIMATE QUIZ CHALLENGE!</h1>
+      <p>Test Your Knowledge in a Fun & Interactive Way!</p>
+      <button class="btn start-btn" onclick="selectLevel()">Select Level</button>
+    </div>
+  </div>
+  <script>
+    let score = 0;
+    let currentQuestionIndex = 0;
+    let selectedDifficulty = '';
+
+    // Question set categorized by difficulty
+    const questions = {
+      easy: [
+        {
+          question: "What does CPU stand for?",
+          options: ["Central Process Unit", "Central Processing Unit", "Computer Personal Unit", "Central Processor Utility"],
+          answer: "Central Processing Unit"
+        },
+        {
+          question: "What does RAM stand for?",
+          options: ["Random Access Memory", "Read Access Memory", "Run All Memory", "Random Arithmetic Memory"],
+          answer: "Random Access Memory"
+        },
+        {
+          question: "Which of the following is an example of an output device?",
+          options: ["Mouse", "Keyboard", "Monitor", "RAM"],
+          answer: "Monitor"
+        },
+        {
+          question: "What does HTTP stand for?",
+          options: ["Hypertext Transfer Protocol", "Hypertext Transfer Process", "Hyper Tool Process", "Hyper Transfer Text Protocol"],
+          answer: "Hypertext Transfer Protocol"
+        },
+        {
+          question: "Which language is primarily used for web development?",
+          options: ["Python", "C++", "Java", "HTML"],
+          answer: "HTML"
+        }
+      ],
+      medium: [
+        {
+          question: "What is the function of a router in a network?",
+          options: ["To route data between networks", "To store files", "To encrypt data", "To manage user access"],
+          answer: "To route data between networks"
+        },
+        {
+          question: "Which data structure uses LIFO (Last In, First Out) principle?",
+          options: ["Queue", "Array", "Stack", "Heap"],
+          answer: "Stack"
+        },
+        {
+          question: "What does DNS stand for?",
+          options: ["Domain Name System", "Digital Network Service", "Data Name Storage", "Direct Node Service"],
+          answer: "Domain Name System"
+        },
+        {
+          question: "What does SQL stand for?",
+          options: ["Structured Query Language", "System Query Language", "Simple Query Logic", "Standard Question Language"],
+          answer: "Structured Query Language"
+        },
+        {
+          question: "In object-oriented programming, what does 'inheritance' allow?",
+          options: ["Methods to override other methods", "Classes to inherit properties from another class", "Creating private methods", "Using multiple constructors"],
+          answer: "Classes to inherit properties from another class"
+        }
+      ],
+      hard: [
+        {
+          question: "What is the time complexity of binary search in a sorted array?",
+          options: ["O(n)", "O(log n)", "O(n^2)", "O(1)"],
+          answer: "O(log n)"
+        },
+        {
+          question: "Which algorithm is used to find the shortest path in a graph?",
+          options: ["Bubble Sort", "Dijkstra's Algorithm", "Merge Sort", "Binary Search"],
+          answer: "Dijkstra's Algorithm"
+        },
+        {
+          question: "What is the primary purpose of a firewall in computer security?",
+          options: ["To monitor network traffic", "To create backups", "To compress files", "To encrypt data"],
+          answer: "To monitor network traffic"
+        },
+        {
+          question: "What is a deadlock in operating systems?",
+          options: ["A situation where processes wait indefinitely", "A method of memory allocation", "A process that terminates unexpectedly", "A system reboot"],
+          answer: "A situation where processes wait indefinitely"
+        },
+        {
+          question: "What is the space complexity of the quicksort algorithm?",
+          options: ["O(log n)", "O(n)", "O(n log n)", "O(n^2)"],
+          answer: "O(log n)"
+        }
+      ]
+    };
+
+    // Function to select the level
+    function selectLevel() {
+      document.querySelector('.quiz-box').innerHTML = `
+        <h1>Select Difficulty Level</h1>
+        <button class="btn" onclick="startQuiz('easy')">Easy</button>
+        <button class="btn" onclick="startQuiz('medium')">Medium</button>
+        <button class="btn" onclick="startQuiz('hard')">Hard</button>
+      `;
+    }
+
+    // Function to start the quiz
+    function startQuiz(level) {
+      selectedDifficulty = level;
+      currentQuestionIndex = 0;
+      score = 0;
+      loadQuestion();
+    }
+
+    // Function to load the question
+    function loadQuestion() {
+      const questionSet = questions[selectedDifficulty];
+      const currentQuestion = questionSet[currentQuestionIndex];
+      
+      document.querySelector('.quiz-box').innerHTML = `
+        <h1>${currentQuestion.question}</h1>
+        ${currentQuestion.options.map((option, index) => `
+          <button class="btn option-btn" onclick="selectOption('${option}')">${option}</button>
+        `).join('')}
+      `;
+    }
+
+    // Function to handle option selection
+    function selectOption(selectedOption) {
+      const questionSet = questions[selectedDifficulty];
+      if (selectedOption === questionSet[currentQuestionIndex].answer) {
+        score++;
+      }
+      currentQuestionIndex++;
+      if (currentQuestionIndex < questionSet.length) {
+        loadQuestion();
+      } else {
+        showScore();
+      }
+    }
+
+    // Function to display score
+    function showScore() {
+      document.querySelector('.quiz-box').innerHTML = `
+        <h1>Your Score: ${score}/${questions[selectedDifficulty].length}</h1>
+        <button class="btn" onclick="selectLevel()">Restart</button>
+      `;
+    }
+
+  </script>
+</body>
+</html>
